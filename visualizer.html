@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Gradient Descent Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.js">
+    </script>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map">
+    </div>
+    <script>
+      function initMap() {
+
+        const file = 'output.csv'
+
+        axios
+        .get(file)
+        .then(resp => {
+          const csv = resp.data
+
+          const coordinates = csv
+          .split('\n')
+          .slice(0, -1)
+          .map(coord => ({
+            lat : parseFloat(coord.split(',')[0]),
+            lng : parseFloat(coord.split(',')[1])
+          }))
+
+          const mapEl = document.getElementById('map')
+          const map = new google.maps.Map(mapEl, {
+            zoom      : 10,
+            center    : coordinates[0],
+            mapTypeId : 'terrain'
+          })
+
+          const path = new google.maps.Polyline({
+            path          : coordinates,
+            geodesic      : true,
+            strokeColor   : '#FF0000',
+            strokeOpacity : 1.0,
+            strokeWeight  : 2
+          })
+
+          path.setMap(map)
+
+          const icon = {
+            path         : google.maps.SymbolPath.CIRCLE,
+            strokeColor  : 'white',
+            fillColor    : 'red',
+            fillOpacity  : 0.4,
+            scale        : 4.5,
+            strokeWeight : 1
+          }
+
+          let time = 0
+          const step = 100
+          const marker = new google.maps.Marker({ map, icon })
+
+          setInterval(() => {
+            if (time > step * coordinates.length) time = 0
+            else marker.setPosition(coordinates[time / 100])
+            time += step
+          }, step)
+
+        })
+      }
+    </script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfgJ5eTO0Rv2A--epCTm_F2xFONR4V9ew&callback=initMap">
+    </script>
+  </body>
+</html>
