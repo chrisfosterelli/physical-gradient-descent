@@ -36,12 +36,16 @@ def gradient_descent(theta, alpha, gamma, num_iters):
 
     for i in range(num_iters):
 
-        cost = compute_cost(theta)
+        try:
+            cost = compute_cost(theta)
 
-        elev1 = get_elevation(theta[0] + 0.001, theta[1])
-        elev2 = get_elevation(theta[0] - 0.001, theta[1])
-        elev3 = get_elevation(theta[0], theta[1] + 0.001)
-        elev4 = get_elevation(theta[0], theta[1] - 0.001)
+            elev1 = get_elevation(theta[0] + 0.001, theta[1])
+            elev2 = get_elevation(theta[0] - 0.001, theta[1])
+            elev3 = get_elevation(theta[0], theta[1] + 0.001)
+            elev4 = get_elevation(theta[0], theta[1] - 0.001)
+        except IndexError:
+            print('The boundary of elevation map has been reached')
+            break
 
         J_history[i] = [ cost, theta[0], theta[1] ]
         if cost <= 0: return theta, J_history
